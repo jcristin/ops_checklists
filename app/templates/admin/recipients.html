@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Email Recipients - Operations Checklists{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-header">
+        <i class="fas fa-envelope me-2"></i>Email Recipients
+    </h1>
+    <a href="{{ url_for('admin.create_recipient') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i>Add Recipient
+    </a>
+</div>
+
+{% if recipients %}
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for recipient in recipients %}
+                    <tr>
+                        <td>{{ recipient.email }}</td>
+                        <td>{{ recipient.name or '-' }}</td>
+                        <td>
+                            {% if recipient.active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="table-actions">
+                            <a href="{{ url_for('admin.edit_recipient', recipient_id=recipient.id) }}" 
+                               class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" 
+                                    data-bs-toggle="modal" data-bs-target="#deleteModal{{ recipient.id }}">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                            
+                            <!-- Delete Modal -->
+                            <div class="modal fade" id="deleteModal{{ recipient.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Confirm Delete</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Are you sure you want to delete the recipient "{{ recipient.email }}"?</p>
+                                            <p class="text-danger">This action cannot be undone.</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <form action="{{ url_for('admin.delete_recipient', recipient_id=recipient.id) }}" method="post">
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i>No email recipients found. Add your first recipient to get started.
+</div>
+{% endif %}
+
+<div class="card mt-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>About Email Recipients
+        </h5>
+    </div>
+    <div class="card-body">
+        <p>Email recipients will receive completed checklists when they are sent via email.</p>
+        <p>Only active recipients will receive emails. You can deactivate recipients temporarily without deleting them.</p>
+        <p>Make sure to configure your email settings in the application configuration to enable sending emails.</p>
+    </div>
+</div>
+{% endblock %}

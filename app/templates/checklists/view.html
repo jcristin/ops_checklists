@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}View Checklist - Operations Checklists{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-header">
+        <i class="fas fa-clipboard-check me-2"></i>Checklist Details
+    </h1>
+    <div>
+        <a href="{{ url_for('checklists.list_checklists') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Back to Checklists
+        </a>
+        
+        {% if not checklist.sent %}
+        <button type="button" class="btn btn-primary ms-2" 
+                data-bs-toggle="modal" data-bs-target="#sendEmailModal">
+            <i class="fas fa-envelope me-1"></i>Send by Email
+        </button>
+        
+        <!-- Send Email Modal -->
+        <div class="modal fade" id="sendEmailModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Email</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to send this checklist by email to all active recipients?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <form action="{{ url_for('checklists.send_checklist', checklist_id=checklist.id) }}" method="post">
+                            <button type="submit" class="btn btn-primary">Send Email</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">{{ checklist.template_name }} - {{ checklist.date }}</h5>
+            <div>
+                {% if checklist.completed %}
+                <span class="badge bg-success">Completed</span>
+                {% else %}
+                <span class="badge bg-warning">In Progress</span>
+                {% endif %}
+                
+                {% if checklist.sent %}
+                <span class="badge bg-info ms-2">Email Sent</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 25%">Group</th>
+                        <th style="width: 45%">Item</th>
+                        <th style="width: 15%">Time</th>
+                        <th style="width: 15%">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set current_group = '' %}
+                    {% for item in items %}
+                        {% if item.group != current_group %}
+                            {% set current_group = item.group %}
+                            <tr class="table-secondary">
+                                <td colspan="4"><strong>{{ current_group }}</strong></td>
+                            </tr>
+                        {% endif %}
+                        
+                        <tr>
+                            <td></td>
+                            <td>{{ item.item }}</td>
+                            <td>{{ item.time }}</td>
+                            <td class="{% if item.status == 'OK' %}status-ok{% else %}status-fail{% endif %}">
+                                {{ item.status }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-4">
+            <p class="text-muted">
+                <small>Created: {{ checklist.created_at }}</small>
+                {% if checklist.sent %}
+                <br>
+                <small>Email sent: Yes</small>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Button -->
+<div class="d-flex justify-content-end">
+    <button type="button" class="btn btn-danger" 
+            data-bs-toggle="modal" data-bs-target="#deleteModal">
+        <i class="fas fa-trash me-1"></i>Delete Checklist
+    </button>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this checklist?</p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('checklists.delete_checklist', checklist_id=checklist.id) }}" method="post">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

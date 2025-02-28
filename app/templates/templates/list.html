@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Templates - Operations Checklists{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-header">
+        <i class="fas fa-list-alt me-2"></i>Checklist Templates
+    </h1>
+    <a href="{{ url_for('templates.create_template') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i>Create Template
+    </a>
+</div>
+
+{% if templates %}
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Items</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for template in templates %}
+                    <tr>
+                        <td>{{ template.name }}</td>
+                        <td>-</td>
+                        <td>{{ template.created_at }}</td>
+                        <td class="table-actions">
+                            <a href="{{ url_for('templates.edit_template', template_id=template.id) }}" 
+                               class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" 
+                                    data-bs-toggle="modal" data-bs-target="#deleteModal{{ template.id }}">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                            
+                            <!-- Delete Modal -->
+                            <div class="modal fade" id="deleteModal{{ template.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Confirm Delete</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Are you sure you want to delete the template "{{ template.name }}"?</p>
+                                            <p class="text-danger">This action cannot be undone and will also delete all items in this template.</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <form action="{{ url_for('templates.delete_template', template_id=template.id) }}" method="post">
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i>No templates found. Create your first template to get started.
+</div>
+{% endif %}
+{% endblock %}

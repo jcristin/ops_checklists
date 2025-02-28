@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Complete Checklist - Operations Checklists{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="page-header">
+        <i class="fas fa-clipboard-check me-2"></i>Complete Checklist
+    </h1>
+    <a href="{{ url_for('checklists.list_checklists') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left me-1"></i>Back to Checklists
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">{{ checklist.template_name }} - {{ checklist.date }}</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {{ form.hidden_tag() }}
+            
+            <div class="alert alert-info mb-4">
+                <i class="fas fa-info-circle me-2"></i>
+                Complete the checklist by entering the time and selecting the status for each item.
+            </div>
+            
+            {% set current_group = '' %}
+            {% for item_form in form.items %}
+                {% if item_form.group.data != current_group %}
+                    {% set current_group = item_form.group.data %}
+                    <div class="group-header">
+                        {{ current_group }}
+                    </div>
+                {% endif %}
+                
+                <div class="checklist-item">
+                    {{ item_form.id() }}
+                    {{ item_form.group() }}
+                    {{ item_form.item() }}
+                    
+                    <div class="row">
+                        <div class="col-md-8 mb-2">
+                            <strong>{{ item_form.item.data }}</strong>
+                        </div>
+                        
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label">Time</label>
+                            {{ item_form.time(class="form-control" + (" is-invalid" if item_form.time.errors else ""), placeholder="HH:MM") }}
+                            {% for error in item_form.time.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label">Status</label>
+                            {{ item_form.status(class="form-select" + (" is-invalid" if item_form.status.errors else "")) }}
+                            {% for error in item_form.status.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <div class="d-grid gap-2 mt-4">
+                {{ form.submit(class="btn btn-success btn-lg") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-fill current time when clicking on a time input
+    document.addEventListener('DOMContentLoaded', function() {
+        const timeInputs = document.querySelectorAll('input[name$="time"]');
+        
+        timeInputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                if (!this.value) {
+                    const now = new Date();
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                    this.value = `${hours}:${minutes}`;
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

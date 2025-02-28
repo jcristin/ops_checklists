@@ -1,0 +1,105 @@
+/* Custom styles for Operations Checklists application */
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+/* Dashboard cards */
+.dashboard-card {
+    transition: transform 0.3s;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Tables */
+.table-actions {
+    white-space: nowrap;
+}
+
+/* Status colors */
+.status-ok {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.status-fail {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Form styling */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+/* Template items */
+.template-item {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.25rem;
+    background-color: #f8f9fa;
+    border-left: 4px solid #6c757d;
+}
+
+.template-item:hover {
+    background-color: #e9ecef;
+}
+
+/* Checklist items */
+.checklist-item {
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-radius: 0.25rem;
+    background-color: #f8f9fa;
+}
+
+.checklist-item:nth-child(odd) {
+    background-color: #e9ecef;
+}
+
+.group-header {
+    background-color: #e2e3e5;
+    padding: 0.5rem 1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: bold;
+}
+
+/* Page headers */
+.page-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Buttons */
+.btn-icon {
+    padding: 0.25rem 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+    
+    .btn-sm {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.8rem;
+    }
+}
