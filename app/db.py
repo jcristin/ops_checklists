@@ -1,14 +1,30 @@
 import sqlite3
+import os
 from datetime import datetime
 from flask import current_app, g
-from app import get_db
+
+def get_db():
+    """Get the database connection"""
+    db = getattr(g, '_database', None)
+    if db is None:
+        from app.config import Config
+        # Ensure the database file exists
+        os.makedirs(os.path.dirname(Config.DATABASE_PATH), exist_ok=True)
+        db = g._database = sqlite3.connect(Config.DATABASE_PATH)
+        db.row_factory = sqlite3.Row  # Return rows as dictionaries
+    return db
 
 def init_db():
     """Initialize the database with tables"""
-    db = get_db()
-    with current_app.open_resource('schema.sql') as f:
-        db.executescript(f.read().decode('utf8'))
-    db.commit()
+    try:
+        db = get_db()
+        with current_app.open_resource('schema.sql') as f:
+            db.executescript(f.read().decode('utf8'))
+        db.commit()
+        return True
+    except Exception as e:
+        current_app.logger.error(f"Database initialization error: {str(e)}")
+        return False
 
 def query_db(query, args=(), one=False):
     """Query the database and return results"""
@@ -126,7 +142,7 @@ def get_checklist(checklist_id):
         WHERE c.id = ?
     ''', (checklist_id,), one=True)
 
-def create_checklist(template_id, date):
+def create_checklist_id(template_id, date):
     """Create a new daily checklist"""
     return insert_db('daily_checklist', {
         'template_id': template_id,

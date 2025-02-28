@@ -22,7 +22,7 @@ cd ops_checklists
 2. Create and activate a virtual environment:
 
 ```
-python -m venv venv
+ven
 # On Windows
 venv\Scripts\activate
 # On macOS/Linux

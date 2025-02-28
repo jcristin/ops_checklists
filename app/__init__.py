@@ -21,6 +21,14 @@ def close_db(e=None):
     if db is not None:
         db.close()
 
+def init_db_with_app(app):
+    """Initialize the database with the app context"""
+    with app.app_context():
+        db = get_db()
+        with app.open_resource('schema.sql') as f:
+            db.executescript(f.read().decode('utf8'))
+        db.commit()
+
 def create_app(config_class=Config):
     """Create and configure the Flask application"""
     app = Flask(__name__)
@@ -34,6 +42,27 @@ def create_app(config_class=Config):
     
     # Register database teardown
     app.teardown_appcontext(close_db)
+    
+    # Initialize the database if it doesn't exist
+    try:
+        if not os.path.exists(Config.DATABASE_PATH) or os.path.getsize(Config.DATABASE_PATH) == 0:
+            with app.app_context():
+                from app.db import init_db
+                init_db()
+                app.logger.info("Database initialized successfully!")
+    except Exception as e:
+        app.logger.error(f"Error initializing database: {str(e)}")
+    
+    # Create a route to reinitialize the database if needed
+    @app.route('/init-db')
+    def initialize_db():
+        try:
+            from app.db import init_db
+            with app.app_context():
+                init_db()
+            return "Database initialized successfully!"
+        except Exception as e:
+            return f"Error initializing database: {str(e)}"
     
     # Register blueprints
     from app.routes import main_bp, templates_bp, checklists_bp, admin_bp

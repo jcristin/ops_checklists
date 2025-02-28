@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, abort
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, abort, g
 from flask_mail import Message
 from app import mail
+# Remove the problematic import
 from app.db import (
     get_templates, get_template, add_template, update_template, delete_template,
     get_template_items, create_template_item, delete_template_item, get_max_position,
-    get_checklists, get_checklist, create_checklist, update_checklist, delete_checklist,
+    get_checklists, get_checklist, create_checklist_id, update_checklist, delete_checklist,
     get_checklist_by_template_date, get_recent_checklists, get_today_checklists_count,
     get_checklist_items, create_checklist_item, update_checklist_item, get_checklist_item,
     get_recipients, get_active_recipients, get_recipient, add_recipient, update_recipient, delete_recipient,
@@ -226,7 +227,7 @@ def create_checklist():
             return redirect(url_for('checklists.edit_checklist', checklist_id=existing['id']))
         
         # Create new checklist
-        checklist_id = create_checklist(template['id'], date_str)
+        checklist_id = create_checklist_id(template['id'], date_str)
                 
         # Create checklist items based on template items
         template_items = get_template_items(template['id'])
